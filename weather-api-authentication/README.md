@@ -14,7 +14,8 @@ fetching current weather information of a city using OpenWeatherMap API with fai
 }
 ```
 - IMP: openweather api url requires to provide it the lattitude and longitude of the city to fetch the weather information. To convert the city name to lattitude and longitude, we can use the OpenWeatherMap Geocoding API. The Geocoding API allows us to convert a city name into its corresponding latitude and longitude coordinates. By making a request to the Geocoding API with the city name, we can retrieve the necessary coordinates to use in the weather API request.
-- 
+- but we are not gonna fall to their sales tactic, and we have hardcoded the latitude and longitude of the city in the input json to fetch the weather information.
+
 ## Output
 
 city:Delhi
