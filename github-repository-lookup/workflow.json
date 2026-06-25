@@ -1,0 +1,120 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/{{ $json.owner }}/{{ $json.repo }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        432,
+        0
+      ],
+      "id": "c083b868-1e05-440d-b91f-cbeea3f511f1",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"owner\": \"torvalds\",\n  \"repo\":\"linux\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "fa56361f-4516-49d1-8ed5-7caec3c009cd",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "path": "9c8b6aad-e3dd-4ffa-855b-78942bb9806a",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b3cbc064-e041-4122-a24b-bd090ffc05eb",
+      "name": "Webhook",
+      "webhookId": "9c8b6aad-e3dd-4ffa-855b-78942bb9806a"
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "=Repository name:{{ $json.name }}\nStars ⭐ :{{ $json.stargazers_count }}\nForks :{{ $json.forks }}\nOpen issues :{{ $json.open_issues_count }}\nPrimary language :{{ $json.language }}\nLast updated :{{ $json.updated_at }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        640,
+        0
+      ],
+      "id": "1104ee14-1411-4678-972e-79e4ef813dce",
+      "name": "Discord",
+      "webhookId": "e9322f0d-0513-4cc9-9ade-90a78d7fd90c",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "AZGguBtBV8ZYdmd8",
+          "name": "Discord Webhook account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "20074ab2-854c-4d2e-bb2c-1d487dc82c4f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f69357b2a5745b462edd578d06971288cf4cd8f876921dab23a9a280ca4033f4"
+  },
+  "nodeGroups": [],
+  "id": "0IPTNGssPaUjWZLZ",
+  "tags": []
+}
