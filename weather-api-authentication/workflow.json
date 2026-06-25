@@ -1,0 +1,236 @@
+{
+  "name": "weather api current weather",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "e0e71da7-2354-4ce2-b0c3-06d16675b3ed",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -112,
+        0
+      ],
+      "id": "2c3b2a2e-b923-419d-9768-0b4f0d77bb23",
+      "name": "Webhook",
+      "webhookId": "e0e71da7-2354-4ce2-b0c3-06d16675b3ed"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7477034a-a2f8-4b36-a5e5-436febf4a619",
+              "name": "body",
+              "value": "={{ $json.body }}",
+              "type": "object"
+            },
+            {
+              "id": "3d59b283-cb43-41c7-a792-cf43e21fbd15",
+              "name": "body",
+              "value": "={{ $json.body }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        96,
+        0
+      ],
+      "id": "76a8aa56-c3bd-456f-8429-27f32ec8188c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.openweathermap.org/data/2.5/weather?lat={{ $json.body.lat }}&lon={{ $json.body.lon }}&appid=e1393806a9d94c388cb4bb1296be2d09&units=metric ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        528,
+        -160
+      ],
+      "id": "a004be5e-14cc-45c8-aa69-16dd3ad5ef5e",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "=city:{{ $('Edit Fields').item.json.body.city }}\nTemperature:{{ $json.main.temp }}\nHumidity: {{ $json.main.humidity }}\nWeather: {{ $json.weather[0].main }}\nWind Speed:  {{ $json.wind.speed }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        784,
+        -112
+      ],
+      "id": "6edda757-dd29-4121-b71f-8dcd5588aad2",
+      "name": "Discord",
+      "webhookId": "d03babcc-9a61-42ef-87f7-8040b032c772",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "AZGguBtBV8ZYdmd8",
+          "name": "Discord Webhook account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c8b1aee4-5979-4149-92e5-156b9142a54e",
+              "leftValue": "={{ $json.body.lat }}",
+              "rightValue": -90,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "eec7bea5-a9cb-4068-a7b9-2b45f6eddcd3",
+              "leftValue": "={{ $json.body.lat }}",
+              "rightValue": 90,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            },
+            {
+              "id": "46e821fb-9d28-4f73-bc42-4ada0c068847",
+              "leftValue": "={{ $json.body.lon }}",
+              "rightValue": -180,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "0018370e-1d79-43c6-8498-e3b56744a50b",
+              "leftValue": "={{ $json.body.lon }}",
+              "rightValue": 180,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        368,
+        0
+      ],
+      "id": "5b8cd10f-46e3-4073-9d7b-ed3eb6836fbd",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "Bad coordinate recieved",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        640,
+        48
+      ],
+      "id": "e6c45f81-daeb-47b4-8b60-bd534b5a1fdc",
+      "name": "Discord1",
+      "webhookId": "486594a0-1b41-4597-add0-c8d22b4a2adb",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "AZGguBtBV8ZYdmd8",
+          "name": "Discord Webhook account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ea5dafeb-c19b-4f26-baa8-b7bf692902d4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f69357b2a5745b462edd578d06971288cf4cd8f876921dab23a9a280ca4033f4"
+  },
+  "nodeGroups": [],
+  "id": "OjIH1l6grbRqhNeg",
+  "tags": []
+}
