@@ -37,29 +37,7 @@ Before assigning leads to the sales team, the agency wants to:
 
 ## Workflow
 
-Webhook
-↓
-Split Out
-↓
-Lead Validation (JavaScript)
-↓
-IF
-├───────────────┐
-│               │
-Valid        Rejected
-│               │
-Region &        │
-Priority        │
-Assignment      │
-│               │
-└───────Merge───┘
-↓
-Aggregate
-↓
-Generate Report
-↓
-Discord
-
+webhook -> Split Out -> Code (Validation) -> IF (two branches) -> Edit Field(SET) -> Code (region and priority assignment), Edit Field(SET)2 -> (two branch input) Merge -> Aggregate -> Code in JavaScript -> Discord
 ---
 
 ## Sample Input
