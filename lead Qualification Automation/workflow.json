@@ -1,0 +1,489 @@
+{
+  "name": "lead Qualification automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "b9606bf5-170d-4d14-a69d-1e71a20ccf47",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -224,
+        -16
+      ],
+      "id": "5f699a21-6b82-4c2e-9fee-329048837b0d",
+      "name": "Webhook",
+      "webhookId": "b9606bf5-170d-4d14-a69d-1e71a20ccf47"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "body",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        -16
+      ],
+      "id": "1580215e-11c3-4d08-b4fd-dc1845f0c26a",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const lead = $json;\n\n// ---------- Clean Inputs ----------\nconst name = (lead.name || \"\").trim();\nconst email = (lead.email || \"\").trim();\nconst company = (lead.company || \"\").trim();\n\n// ---------- Validation ----------\nconst validName = name !== \"\";\n\nconst validCompany = company !== \"\";\n\nfunction isValidEmail(email) {\n\n    email = (email || \"\").trim();\n\n    const parts = email.split(\"@\");\n\n    return (\n        parts.length === 2 &&\n        parts[0] !== \"\" &&\n        parts[1] !== \"\" &&\n        parts[1].includes(\".\") &&\n        !parts[1].startsWith(\".\") &&\n        !parts[1].endsWith(\".\")\n    );\n}\nconst validEmail = isValidEmail(lead.email);\n// ---------- Overall Status ----------\nconst isValidLead =\n    validName &&\n    validCompany &&\n    validEmail;\n\n// ---------- Reason ----------\nlet reason = null;\n\nif (!validName) {\n    reason = \"Missing name\";\n}\nelse if (!validCompany) {\n    reason = \"Missing company\";\n}\nelse if (!validEmail) {\n    reason = \"Invalid email\";\n}\n\n// ---------- Status ----------\nconst status = isValidLead ? \"Pending\" : \"Rejected\";\n\n// ---------- Return ----------\nreturn {\n    json: {\n        ...lead,\n\n        validation: {\n            name: validName,\n            company: validCompany,\n            email: validEmail\n        },\n\n        isValidLead,\n        status,\n        reason\n    }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        -16
+      ],
+      "id": "f1238491-c755-47a4-a96d-2505c5f0167c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a46c9318-db1d-4a79-a5ba-891f702bcd01",
+              "leftValue": "={{ $json.isValidLead }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        480,
+        -16
+      ],
+      "id": "2436f88d-3a08-4eb9-9105-3b9b2ac64c01",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const lead = $json;\n\nlet region = \"Other\";\n\nswitch (lead.country) {\n    case \"USA\":\n    case \"Canada\":\n    case \"Mexico\":\n        region = \"North America\";\n        break;\n\n    case \"Germany\":\n        region = \"Europe\";\n        break;\n\n    case \"India\":\n    case \"Singapore\":\n    case \"Australia\":\n    case \"South Korea\":\n        region = \"APAC\";\n        break;\n}\n\nlet priority = \"Low\";\n\nswitch (region) {\n    case \"North America\":\n        priority = \"High\";\n        break;\n\n    case \"Europe\":\n    case \"APAC\":\n        priority = \"Medium\";\n        break;\n}\n\nreturn {\n    json: {\n        ...lead,\n        region,\n        priority,\n        status: \"Qualified\"\n    }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        704,
+        -176
+      ],
+      "id": "19a0f3f8-f473-4d54-af1e-5e463b4b498b",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2dc93b2e-9955-404e-abb8-4d91a7496d82",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "f73e6400-6763-4448-b4ae-0f4466ce0d45",
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "02c13d40-2a2e-4634-a8a2-b4bcea0bb9c7",
+              "name": "company",
+              "value": "={{ $json.company }}",
+              "type": "string"
+            },
+            {
+              "id": "ff9e043c-887b-45e6-85cf-f2e0e1fdfbc8",
+              "name": "country",
+              "value": "={{ $json.country }}",
+              "type": "string"
+            },
+            {
+              "id": "24295962-9142-474b-8465-7036c20d0c30",
+              "name": "region",
+              "value": "={{ $json.region }}",
+              "type": "string"
+            },
+            {
+              "id": "84d5c4fe-473b-40f9-a27f-ccca01851b1c",
+              "name": "priority",
+              "value": "={{ $json.priority }}",
+              "type": "string"
+            },
+            {
+              "id": "e8c4a8f3-30ca-42f5-b6d4-a15570c3bf88",
+              "name": "status",
+              "value": "={{ $json.status }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        848,
+        -16
+      ],
+      "id": "7fc3a87b-af34-4f99-82cd-412ee6aa6e80",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7856e12a-06bd-43d0-bd2a-f45df16f8dc8",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "5eefb655-55ae-4d70-af5f-7435e82d8507",
+              "name": "status",
+              "value": "={{ $json.status }}",
+              "type": "string"
+            },
+            {
+              "id": "ddd236c9-cef6-4862-baec-974e31b05845",
+              "name": "reason",
+              "value": "={{ $json.reason }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        816,
+        160
+      ],
+      "id": "e2f294fc-35d6-4616-aeaf-964578b3fd8a",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1088,
+        64
+      ],
+      "id": "4c42c6db-1278-426c-911d-0c8420ca042f",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        64
+      ],
+      "id": "2299e794-fb7b-4ca3-9525-15f478d1e7be",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst leads = data.data;\n\nlet report = \"📊 Daily Lead Qualification Report\\n\\n\";\n\nlet qualifiedCount = 0;\nlet rejectedCount = 0;\nlet highPriorityCount = 0;\n\nreport += \"✅ Qualified Leads\\n\\n\";\n\nfor (const lead of leads) {\n    if (lead.status === \"Qualified\") {\n        qualifiedCount++;\n\n        if (lead.priority === \"High\") {\n            highPriorityCount++;\n        }\n\n        report += `${lead.name}\\n`;\n        report += `${lead.company}\\n`;\n        report += `Region: ${lead.region}\\n`;\n        report += `Priority: ${lead.priority}\\n\\n`;\n    }\n}\n\nreport += \"--------------------------\\n\\n\";\n\nreport += \"❌ Rejected Leads\\n\\n\";\n\nfor (const lead of leads) {\n    if (lead.status === \"Rejected\") {\n\n        rejectedCount++;\n\n        report += `${lead.name}\\n`;\n        report += `Reason: ${lead.reason}\\n\\n`;\n    }\n}\n\nreport += \"==========================\\n\\n\";\n\nreport += `Qualified : ${qualifiedCount}\\n`;\nreport += `Rejected  : ${rejectedCount}\\n`;\nreport += `High Priority : ${highPriorityCount}`;\n\nreturn [\n    {\n        json: {\n            report\n        }\n    }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1504,
+        64
+      ],
+      "id": "77000501-5ca8-421b-823c-c0ad2ed5f573",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "={{ $json.report }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1712,
+        64
+      ],
+      "id": "06d37c00-4270-4a0e-8da6-aed6541f66e6",
+      "name": "Discord",
+      "webhookId": "5522525a-3139-4144-a1c3-c962a92c97a0",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "AZGguBtBV8ZYdmd8",
+          "name": "Discord Webhook account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Merge": [
+      {
+        "json": {
+          "name": "John Smith",
+          "email": "john.smith@acme.com",
+          "company": "Acme Ltd",
+          "country": "USA",
+          "region": "North America",
+          "priority": "High",
+          "status": "Qualified"
+        }
+      },
+      {
+        "json": {
+          "name": "Alice Brown",
+          "email": "alice@gmail.com",
+          "company": "Bright Labs",
+          "country": "India",
+          "region": "APAC",
+          "priority": "Medium",
+          "status": "Qualified"
+        }
+      },
+      {
+        "json": {
+          "name": "Michael Chen",
+          "email": "michael@globex.io",
+          "company": "Globex Inc",
+          "country": "Canada",
+          "region": "North America",
+          "priority": "High",
+          "status": "Qualified"
+        }
+      },
+      {
+        "json": {
+          "name": "Sarah Wilson",
+          "email": "sarah.wilson@",
+          "company": "FutureTech LLC",
+          "country": "Germany",
+          "region": "Europe",
+          "priority": "Medium",
+          "status": "Qualified"
+        }
+      },
+      {
+        "json": {
+          "name": "Emma Davis",
+          "email": "emma@enterprisecorp.com",
+          "company": "Enterprise Corp",
+          "country": "Australia",
+          "region": "APAC",
+          "priority": "Medium",
+          "status": "Qualified"
+        }
+      },
+      {
+        "json": {
+          "name": "Ryan Patel",
+          "email": "ryan@startuphub.co",
+          "company": "StartupHub",
+          "country": "India",
+          "region": "APAC",
+          "priority": "Medium",
+          "status": "Qualified"
+        }
+      },
+      {
+        "json": {
+          "name": "Noah Kim",
+          "email": "noah@nextgen.org",
+          "company": "NextGen LLC",
+          "country": "South Korea",
+          "region": "APAC",
+          "priority": "Medium",
+          "status": "Qualified"
+        }
+      },
+      {
+        "json": {
+          "name": "Olivia Taylor",
+          "email": "olivia@alphasoft.com",
+          "company": "AlphaSoft Inc",
+          "country": "USA",
+          "region": "North America",
+          "priority": "High",
+          "status": "Qualified"
+        }
+      },
+      {
+        "json": {
+          "name": "David Lee",
+          "status": "Rejected",
+          "reason": "Missing company"
+        }
+      },
+      {
+        "json": {
+          "name": "Sophia Garcia",
+          "status": "Rejected",
+          "reason": "Invalid email"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "075088e7-4010-4488-bf36-3074ae5a5d57",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f69357b2a5745b462edd578d06971288cf4cd8f876921dab23a9a280ca4033f4"
+  },
+  "nodeGroups": [],
+  "id": "J2kd11lxDDBzkd41",
+  "tags": []
+}

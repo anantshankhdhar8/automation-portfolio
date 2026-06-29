@@ -1,0 +1,59 @@
+📊 Daily Lead Qualification Report
+
+✅ Qualified Leads
+
+John Smith
+Acme Ltd
+Region: North America
+Priority: High
+
+Alice Brown
+Bright Labs
+Region: APAC
+Priority: Medium
+
+Michael Chen
+Globex Inc
+Region: North America
+Priority: High
+
+Sarah Wilson
+FutureTech LLC
+Region: Europe
+Priority: Medium
+
+Emma Davis
+Enterprise Corp
+Region: APAC
+Priority: Medium
+
+Ryan Patel
+StartupHub
+Region: APAC
+Priority: Medium
+
+Noah Kim
+NextGen LLC
+Region: APAC
+Priority: Medium
+
+Olivia Taylor
+AlphaSoft Inc
+Region: North America
+Priority: High
+
+--------------------------
+
+❌ Rejected Leads
+
+David Lee
+Reason: Missing company
+
+Sophia Garcia
+Reason: Invalid email
+
+==========================
+
+Qualified : 8
+Rejected  : 2
+High Priority : 3
